@@ -5,7 +5,7 @@
 class idfxUserDataGetListProcessor extends modObjectGetListProcessor {
 	public $objectType = 'idfxUserData';
 	public $classKey = 'idfxUserData';
-	public $defaultSortField = 'user_id';
+	public $defaultSortField = 'user_name';
 	public $defaultSortDirection = 'ASC';
 	//public $permission = 'list';
 
@@ -15,16 +15,23 @@ class idfxUserDataGetListProcessor extends modObjectGetListProcessor {
 	 */
 	public function prepareQueryBeforeCount(xPDOQuery $c) {
 
-		$q = trim($this->getProperty('query'));
-		if ($q) {
-			$c->where(array(
-				'user_name:LIKE' => "%{$q}%",
-			));
-		}
-
 		$c->leftJoin('modUserProfile', 'modUserProfile', 'user_id = modUserProfile.internalKey');
 		$c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
 		$c->select('modUserProfile.blocked, modUserProfile.fullname as user_name');
+
+		$q = trim($this->getProperty('query'));
+		if ($q) {
+			$c->where(array(
+				'modUserProfile.fullname:LIKE' => "%{$q}%",
+			));
+		}
+
+		if ($this->getProperty('user_filter')) {
+			$filter = array(
+				'user_id' => $this->getProperty('user_filter'),
+			);
+			$c->where($filter);
+		}
 
 		return $c;
 	}

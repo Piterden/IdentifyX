@@ -12,7 +12,7 @@ IdentifyX.window.CreateData = function (config) {
 		fields: this.getFields(config),
 		keys: [{
 			key: Ext.EventObject.ENTER, shift: true, fn: function () {
-				this.submit()
+				this.submit();
 			}, scope: this
 		}]
 	});
@@ -69,7 +69,7 @@ IdentifyX.window.UpdateData = function (config) {
 		fields: this.getFields(config),
 		keys: [{
 			key: Ext.EventObject.ENTER, shift: true, fn: function () {
-				this.submit()
+				this.submit();
 			}, scope: this
 		}]
 	});

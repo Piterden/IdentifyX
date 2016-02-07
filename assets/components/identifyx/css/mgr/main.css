@@ -93,3 +93,18 @@ ul.identifyx-row-actions .actions-menu:after {
     font-size: 1.1em;
     line-height: 1.1em;
 }
+
+#identifyx-grid-data .icon {
+    font-size: 20px !important;
+    line-height: 0.8;
+}
+
+#identifyx-grid-data .x-grid3-cell-inner,
+#identifyx-grid-data .x-grid3-hd-inner {
+	padding: 3px 3px 3px 5px;
+}
+
+#identifyx-grid-data .x-grid3-row-table td {
+	padding: 2px;
+	vertical-align: middle;
+}

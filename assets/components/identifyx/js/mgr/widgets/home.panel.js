@@ -47,7 +47,7 @@ IdentifyX.panel.Home = function(config) {
                     xtype: 'identifyx-grid-ips',
                     cls: 'main-wrapper',
                 }]
-            }/*, {
+            }, {
                 title: _('identifyx_likes'),
                 layout: 'anchor',
                 items: [{
@@ -57,7 +57,7 @@ IdentifyX.panel.Home = function(config) {
                     xtype: 'identifyx-grid-likes',
                     cls: 'main-wrapper',
                 }]
-            }*/]
+            }]
         }]
     });
     IdentifyX.panel.Home.superclass.constructor.call(this, config);

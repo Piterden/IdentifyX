@@ -23,10 +23,12 @@ class IdentifyXHomeManagerController extends IdentifyXManagerController {
 	 * @return void
 	 */
 	public function loadCustomCssJs() {
-		$this->addCss($this->identifyx->config['cssUrl'] . 'mgr/main.css');
 		$this->addCss($this->identifyx->config['cssUrl'] . 'mgr/bootstrap.buttons.css');
+		$this->addCss($this->identifyx->config['cssUrl'] . 'mgr/main.css');
 		$this->addJavascript($this->identifyx->config['jsUrl'] . 'mgr/misc/utils.js');
 		$this->addJavascript($this->identifyx->config['jsUrl'] . 'mgr/misc/combo.js');
+		$this->addJavascript($this->identifyx->config['jsUrl'] . 'mgr/widgets/likes.grid.js');
+		$this->addJavascript($this->identifyx->config['jsUrl'] . 'mgr/widgets/likes.windows.js');
 		$this->addJavascript($this->identifyx->config['jsUrl'] . 'mgr/widgets/ips.grid.js');
 		$this->addJavascript($this->identifyx->config['jsUrl'] . 'mgr/widgets/ips.windows.js');
 		$this->addJavascript($this->identifyx->config['jsUrl'] . 'mgr/widgets/data.grid.js');

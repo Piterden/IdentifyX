@@ -5,6 +5,7 @@
 class IdentifyX {
 	/* @var modX $modx */
 	public $modx;
+	//public $fp;
 
 	/**
 	 * @param modX $modx
@@ -43,43 +44,65 @@ class IdentifyX {
 	}
 
 	public function checkFp(array $params) {
+		$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] !!!!!!check start '.print_r($params, true));
 		$user_id = $params['user_id'];
 		$res_id = $params['res_id'];
 		$fp_val = $params['fp'];
-
+		if (empty($fp_val)) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] check fp no set< '.print_r($fp_val, true));
+			return array(
+				'error' => 'fp_is_empty',
+				'lang_error' => $this->modx->lexicon('identifyx_err_fp_lost'),
+			);
+		}
 		// if not in table - create new
-		if (!$fp_obj = $this->getFp($fp_val)) {
-			$fp_obj = $this->addFp($fp_val);
-		} else {
-			// if auth and back to likedislike
-			if ($user_id > 0) {
-				return true;
-			}
+		if (!$fp_obj = $this->getFp($fp_val, $user_id)) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] new fp '.print_r($params, true));
+			$fp_obj = $this->addFp($fp_val, $user_id);
+		}
+		$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] fp '.print_r($fp_obj->toArray(), true));
+		// if auth - back to likedislike
+		if ($user_id > 0) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] authorized back '.print_r($user_id, true));
+			return true;
 		}
 
-		// check vote
-		if ($this->getLike($fp_obj->get('id'), $res_id) && $user_id == 0) {
+		$is_voted = $this->modx->getCount('idfxUserLikes', array(
+			'finger' => $fp_obj->get('id'),
+			'res_id' => $res_id,
+		));
+		if ($is_voted > 0) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] already voted send error '.print_r($fp_obj->toArray(), true));
 			return array(
 				'error' => 'fp_already_voted',
 				'lang_error' => $this->modx->lexicon('identifyx_err_fp_blocked'),
 			);
 		}
-        return true;
 
+		$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] check end ');
+        return true;
 	}
 
 	public function idfxProcess(array $params) {
+		$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] process start '.print_r($params, true));
 		$user_id = $params['user_id'];
 		$fp_val = $params['fp'];
-		$fp_obj = $this->getFp($fp_val, $user_id);
+		if (!$fp_obj = $this->getFp($fp_val, $user_id)) {
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] process not get $fp_obj '.print_r($fp_val, true).print_r($user_id, true));
+			return true;
+		}
 		$fp_id = $fp_obj->get('id');
-
+		$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] process start add like'.$fp_id.$params['res_id'].$user_id);
 		$this->addLike($fp_id, $params['res_id'], $user_id);
 		$this->calculateVotes($fp_obj, $user_id);
 		if (!$this->getIp($fp_id, $params['ip'], $user_id)) {
-			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] params'.print_r($params, true));
-			$this->addIp($fp_id, $params['ip'], $user_id);
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] process ip not found');
+			$ip = $this->addIp($fp_id, $params['ip'], $user_id);
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] process new ip aded '.$ip);
 		};
+
+
+		$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] process finished ');
 		return true;
 	}
 
@@ -91,12 +114,12 @@ class IdentifyX {
 		));
 		$fp_obj->set('votes', $votes);
 		if (!$fp_obj->save()) {
-			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] fp not calculated');
+			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] votes not calculated');
 		}
 		return $fp_obj->toArray();
 	}
 
-	public function getFp($fp, $user_id = 0) {
+	public function getFp($fp, $user_id) {
 		if ($fp_obj = $this->modx->getObject('idfxUserData', array(
 			'fingerprint' => $fp,
 			'user_id' => $user_id,
@@ -167,91 +190,5 @@ class IdentifyX {
 		// $this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] like '.print_r($like->toArray(),true));
 		return $like->toArray();
 	}
-
-
-
-	// 	// The name of the array to retrieve the name of the category, it is easier sorting in admin panel
- //        $cat = explode('::',$name);
- //        // Attempt to create a new item
- //        $item->set('category',$cat[0]);
- //        $item->set('date',time());
- //        $item->set('closed',FALSE);
- //        $item->set('votes_up',0);
- //        $item->set('votes_down',0);
- //        if(!$item->save()){
- //            return FALSE;
- //        }
- //        return $item;
-
-	/**
-	 * Method loads custom controllers
-	 * @var string $dir Directory for load controllers
-	 * @return void
-	 */
- 	// public function loadController($name) {
- 	// 	require_once 'controller.class.php';
- 	// 	$name = strtolower(trim($name));
- 	// 	$file = $this->config['controllersPath'] . $name . '/' . $name.'.class.php';
- 	// 	if (!file_exists($file)) {$file = $this->config['controllersPath'] . $name.'.class.php';}
- 	// 	if (file_exists($file)) {
- 	// 		$class = include_once($file);
- 	// 		if (!class_exists($class)) {
- 	// 			$this->modx->log(modX::LOG_LEVEL_ERROR, '[Identifyx] Wrong controller at '.$file);
- 	// 		}
- 	// 		/* @var IdentifyXDefaultController $controller */
- 	// 		else if ($controller = new $class($this, $this->config)) {
- 	// 			if ($controller instanceof IdentifyXDefaultController && $controller->initialize()) {
- 	// 				$this->controllers[strtolower($name)] = $controller;
- 	// 			}
- 	// 			else {
- 	// 				$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] Could not load controller '.$file);
- 	// 			}
- 	// 		}
- 	// 	}
- 	// 	else {
- 	// 		$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] Could not find controller '.$file);
- 	// 	}
- 	// }
-
- 	// /**
- 	//  * Loads given action, if exists, and transfers work to it
- 	//  * @param $action
- 	//  * @param array $scriptProperties
- 	//  * @return bool
- 	//  */
- 	// public function loadAction($action, $scriptProperties = array()) {
- 	// 	if (!empty($action)) {
- 	// 		@list($name, $action) = explode('/', strtolower(trim($action)));
- 	// 		if (!isset($this->controllers[$name])) {
- 	// 			$this->loadController($name);
- 	// 		}
- 	// 		if (isset($this->controllers[$name])) {
- 	// 			/* @var IdentifyXDefaultController $controller */
- 	// 			$controller = $this->controllers[$name];
- 	// 			$controller->setDefault($scriptProperties);
- 	// 			if (empty($action)) {$action = $controller->getDefaultAction();}
- 	// 			if (method_exists($controller, $action)) {
- 	// 				return $controller->$action($scriptProperties);
- 	// 			}
- 	// 		}
- 	// 		else {
- 	// 			return 'Could not load controller "'.$name.'"';
- 	// 		}
- 	// 	}
- 	// 	return false;
- 	// }
- 	// /**
- 	//  * Shorthand for load and run an processor in this component
- 	//  * @param string $action
- 	//  * @param array $scriptProperties
- 	//  * @return mixed
- 	//  */
- 	// function runProcessor($action = '', $scriptProperties = array()) {
- 	// 	$this->modx->error->errors = $this->modx->error->message = null;
- 	// 	return $this->modx->runProcessor($action, $scriptProperties, array(
- 	// 			'processors_path' => $this->config['processorsPath']
- 	// 		)
- 	// 	);
- 	// }
 
 }

@@ -48,11 +48,6 @@
         <field key="user_id" dbtype="int" precision="10" phptype="integer" default="0" attributes="unsigned" />
         <field key="finger" dbtype="int" precision="10" phptype="integer" null="false" default="0" attributes="unsigned" />
 
-        <index alias="user_ip" name="user_ip" primary="false" unique="true" type="BTREE">
-            <column key="user_id" length="" collation="A" null="false" />
-            <column key="ip" length="" collation="A" null="false" />
-        </index>
-
         <aggregate alias="User" class="modUser" local="ip" foreign="id" cardinality="many" owner="foreign" />
     </object>
 

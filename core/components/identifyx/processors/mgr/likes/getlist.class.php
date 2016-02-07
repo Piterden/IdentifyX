@@ -5,8 +5,8 @@
 class idfxUserLikesGetListProcessor extends modObjectGetListProcessor {
 	public $objectType = 'idfxUserLikes';
 	public $classKey = 'idfxUserLikes';
-	public $defaultSortField = 'id';
-	public $defaultSortDirection = 'ASC';
+	public $defaultSortField = 'createdon';
+	public $defaultSortDirection = 'DESC';
 	//public $permission = 'list';
 
 	/**
@@ -16,15 +16,15 @@ class idfxUserLikesGetListProcessor extends modObjectGetListProcessor {
 	public function prepareQueryBeforeCount(xPDOQuery $c) {
 		$q = trim($this->getProperty('query'));
 
-		$c->innerJoin('modUser', 'User', 'User.id = idfxUserLikes.user_id');
-		$c->innerJoin('modResource', 'Resource', 'Resource.id = idfxUserLikes.res_id');
+		$c->leftJoin('modUserProfile', 'modUserProfile', 'createdby = modUserProfile.internalKey');
+		$c->leftJoin('modResource', 'modResource', 'res_id = modResource.id');
 		$c->select($this->modx->getSelectColumns('idfxUserLikes', 'idfxUserLikes'));
-		$c->select('User.fullname as user_name, Resource.pagetitle as title');
+		$c->select('modUserProfile.fullname as user_name, modResource.pagetitle as title');
 
 		if ($q) {
 			$c->where(array(
-				'user_name:LIKE' => "%{$q}%",
-				'OR:title:LIKE' => "%{$q}%",
+				'modUserProfile.fullname:LIKE' => "%{$q}%",
+				'OR:modResource.pagetitle:LIKE' => "%{$q}%",
 			));
 		}
 
