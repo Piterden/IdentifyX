@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model package="identifyx" baseClass="xPDOObject" platform="mysql" defaultEngine="MyISAM" phpdoc-package="identifyx" version="1.1">
+
+    <object class="idfxUser" extends="modUser">
+    	<composite alias="Pic" class="idfxUserPic" local="id" foreign="user_id" cardinality="one" owner="local" />
+    	<composite alias="Likes" class="idfxUserLikes" local="id" foreign="createdby" cardinality="many" owner="local" />
+        <composite alias="Fingers" class="idfxUserData" local="id" foreign="user_id" cardinality="many" owner="local" />
+    </object>
+
+    <object class="idfxResource" extends="modResource">
+        <composite alias="Likes" class="idfxUserLikes" local="id" foreign="res_id" cardinality="many" owner="local" />
+    </object>
+
+    <object class="idfxUserPic" table="ix_user_pic" extends="xPDOObject">
+        <field key="internalKey" dbtype="int" precision="10" phptype="integer" null="false" attributes="unsigned" index="fk" />
+        <field key="photo_100" dbtype="varchar" precision="255" phptype="string" null="true" />
+
+        <index alias="PRIMARY" name="PRIMARY" primary="true" unique="true" type="BTREE">
+            <column key="internalKey" length="" collation="A" null="false" />
+        </index>
+
+    	<aggregate alias="User" class="modUser" local="internalKey" foreign="id" cardinality="one" owner="foreign" />
+    </object>
+
+    <object class="idfxUserData" table="ix_user_finger" extends="xPDOSimpleObject">
+        <field key="fingerprint" dbtype="varchar" precision="50" phptype="string" null="false" default="" />
+        <field key="votes" dbtype="int" precision="5" phptype="integer" attributes="unsigned" null="false" default="0" />
+        <field key="user_id" dbtype="int" precision="10" phptype="integer" default="0" attributes="unsigned" />
+
+        <index alias="user_id" name="user_id" primary="false" unique="false" type="BTREE">
+            <column key="user_id" length="" collation="A" null="false" />
+        </index>
+        <index alias="votes" name="votes" primary="false" unique="false" type="BTREE">
+            <column key="votes" length="" collation="A" null="false" />
+        </index>
+        <index alias="fp_owner" name="fp_owner" primary="false" unique="true" type="BTREE">
+            <column key="user_id" length="" collation="A" null="false" />
+            <column key="fingerprint" length="" collation="A" null="false" />
+        </index>
+
+        <aggregate alias="User" class="modUser" local="user_id" foreign="id" cardinality="one" owner="foreign" />
+        <composite alias="Ips" class="idfxUserIps" local="id" foreign="finger" cardinality="many" owner="local" />
+        <composite alias="Likes" class="idfxUserLikes" local="id" foreign="finger" cardinality="many" owner="local" />
+    </object>
+
+    <object class="idfxUserIps" table="ix_user_ips" extends="xPDOSimpleObject">
+        <field key="ip" dbtype="varchar" precision="100" phptype="string" null="false" default="" index="index" />
+        <field key="user_id" dbtype="int" precision="10" phptype="integer" default="0" attributes="unsigned" />
+        <field key="finger" dbtype="int" precision="10" phptype="integer" null="false" default="0" attributes="unsigned" />
+
+        <index alias="user_ip" name="user_ip" primary="false" unique="true" type="BTREE">
+            <column key="user_id" length="" collation="A" null="false" />
+            <column key="ip" length="" collation="A" null="false" />
+        </index>
+
+        <aggregate alias="User" class="modUser" local="ip" foreign="id" cardinality="many" owner="foreign" />
+    </object>
+
+    <object class="idfxUserLikes" table="ix_user_likes" extends="xPDOSimpleObject">
+        <field key="finger" dbtype="int" precision="10" phptype="integer" null="false" attributes="unsigned" />
+        <field key="res_id" dbtype="int" precision="10" phptype="integer" null="false" attributes="unsigned" />
+		<field key="createdby" dbtype="int" precision="10" phptype="integer" null="false" default="0" attributes="unsigned"/>
+        <field key="createdon" dbtype="int" precision="20" phptype="timestamp" null="false" default="0" />
+
+        <index alias="finger" name="finger" primary="false" unique="false" type="BTREE">
+            <column key="finger" length="" collation="A" null="false" />
+        </index>
+        <index alias="res_id" name="res_id" primary="false" unique="false" type="BTREE">
+            <column key="res_id" length="" collation="A" null="false" />
+        </index>
+
+		<aggregate alias="CreatedBy" class="modUser" local="createdby" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Res" class="modResource" local="res_id" foreign="id" cardinality="one" owner="foreign" />
+        <aggregate alias="Finger" class="idfxUserData" local="finger" foreign="id" cardinality="one" owner="foreign" />
+    </object>
+</model>
