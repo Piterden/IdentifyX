@@ -4,7 +4,7 @@ IdentifyX.panel.Home = function(config) {
         baseCls: 'modx-formpanel',
         layout: 'anchor',
         stateful: true,
-        //stateId: 'act',
+        stateId: 'act',
         stateEvents: ['tabchange'],
         getState: function() {
             return {
@@ -37,7 +37,7 @@ IdentifyX.panel.Home = function(config) {
                     xtype: 'identifyx-grid-data',
                     cls: 'main-wrapper',
                 }]
-            }, {
+            },/* {
                 title: _('identifyx_ips'),
                 layout: 'anchor',
                 items: [{
@@ -47,7 +47,7 @@ IdentifyX.panel.Home = function(config) {
                     xtype: 'identifyx-grid-ips',
                     cls: 'main-wrapper',
                 }]
-            }, {
+            },*/ {
                 title: _('identifyx_likes'),
                 layout: 'anchor',
                 items: [{

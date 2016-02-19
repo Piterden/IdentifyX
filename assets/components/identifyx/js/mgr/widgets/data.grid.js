@@ -56,8 +56,8 @@ Ext.extend(IdentifyX.grid.Data, MODx.grid.Grid, {
     getMenu: function(grid, row) {
         var cs = this._getSelectedIds();
         var m = [];
+        console.log(row);
         if (cs.length > 1) {
-            console.log(row);
             if (true) {
                 m.push({
                     text: '<i class="icon icon-times-circle-o error"></i>&nbsp;' + _('identifyx_users_disable'),
@@ -163,6 +163,7 @@ Ext.extend(IdentifyX.grid.Data, MODx.grid.Grid, {
         }, {
             header: _('identifyx_user_name'),
             dataIndex: 'user_name',
+            emptyText: _('identifyx_user_noauth'),
             sortable: true,
             width: 100,
         }, {

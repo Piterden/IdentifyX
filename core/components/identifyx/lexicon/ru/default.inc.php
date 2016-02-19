@@ -29,6 +29,7 @@ $_lang['identifyx_items_remove'] = 'Удалить элементы';
 $_lang['identifyx_item_remove_confirm'] = 'Вы уверены, что хотите удалить этот элемент?';
 $_lang['identifyx_items_remove_confirm'] = 'Вы уверены, что хотите удалить эти элементы?';
 
+$_lang['identifyx_user_noauth'] = 'Неавторизованный пользователь';
 $_lang['identifyx_select_user'] = 'Выберите пользователя';
 $_lang['identifyx_user_active'] = 'Пользователь активен';
 $_lang['identifyx_user_blocked'] = 'Пользователь заблокирован';

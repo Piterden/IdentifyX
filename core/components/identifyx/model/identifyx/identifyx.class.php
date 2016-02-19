@@ -49,11 +49,15 @@ class IdentifyX {
 		$res_id = $params['res_id'];
 		$fp_val = $params['fp'];
 		if (empty($fp_val)) {
-			$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] check fp no set< '.print_r($fp_val, true));
-			return array(
-				'error' => 'fp_is_empty',
-				'lang_error' => $this->modx->lexicon('identifyx_err_fp_lost'),
-			);
+			if (empty($user_id)) {
+				$this->modx->log(modX::LOG_LEVEL_ERROR, '[IdentifyX] check fp no set< '.print_r($fp_val, true));
+				return array(
+					'error' => 'fp_is_empty',
+					'lang_error' => $this->modx->lexicon('identifyx_err_fp_lost'),
+				);
+			} else {
+				return true;
+			}
 		}
 		// if not in table - create new
 		if (!$fp_obj = $this->getFp($fp_val, $user_id)) {
